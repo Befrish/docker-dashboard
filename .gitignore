@@ -1,0 +1,59 @@
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+### Mac OS ###
+.DS_Store
+
+# NetBeans project files
+nb-configuration*.xml
+nbactions*.xml
+
+# Maven
+target/
+build/
+.mvn/
+.gradle
+!**/src/main/**/target/
+!**/src/test/**/target/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Git
+.gitreview
+
+# Vaadin
+# The following files are automatically generated/updated
+node_modules/
+/node_modules/
+frontend/generated/
+.npmrc
+vite.generated.ts
+package-lock.json

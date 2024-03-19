@@ -1,0 +1,17 @@
+server:
+  port: ${PORT:8080}
+
+logging:
+  level:
+    org.atmosphere: warn
+
+#spring:
+  # To improve the performance during development.
+#  jpa:
+#    defer-datasource-initialization: true
+
+vaadin:
+  # For more information https://vaadin.com/docs/flow/spring/tutorial-spring-configuration.html#special-configuration-parameters
+  allowed-packages: com.vaadin,org.vaadin,de.befrish.docker.dashboard
+  # Launch the default browser when starting the application in development mode
+  launch-browser: true

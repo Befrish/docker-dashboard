@@ -1,0 +1,28 @@
+version: '3.3'
+# Containers for testing
+
+services:
+
+  app42:
+    image: nginx:latest
+    ports:
+      - "15001:80"
+#    volumes:
+#      - ./html:/usr/share/nginx/html
+
+  app44:
+    image: nginx:1.25
+    ports:
+      - "15002:80"
+
+  app53:
+    # Spring Boot Actuator + Simple Version-Endpoint
+    image: example.com/demo/version-demo-app:latest
+    ports:
+      - "16001:8080"
+
+  app55:
+    # Spring Boot Actuator + Simple Version-Endpoint
+    image: example.com/demo/version-demo-app:latest
+    ports:
+      - "16002:8080"
