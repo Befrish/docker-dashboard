@@ -11,7 +11,7 @@ import static com.spotify.docker.client.DockerClient.ListContainersParam.filter;
 
 @Service
 @RequiredArgsConstructor
-public class DockerClientContainerResolver implements ContainerResolver {
+public class DockerClientContainerResolver implements DockerContainerResolver {
 
     @NonNull
     private ReactiveDockerClient dockerClient;

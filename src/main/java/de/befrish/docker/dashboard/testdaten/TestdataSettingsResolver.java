@@ -1,4 +1,4 @@
-package de.befrish.docker.dashboard.service.dummy;
+package de.befrish.docker.dashboard.testdaten;
 
 import de.befrish.docker.dashboard.domain.Settings;
 import de.befrish.docker.dashboard.domain.SettingsContainer;

@@ -8,7 +8,9 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
 import de.befrish.docker.dashboard.domain.HasContainerId;
+import de.befrish.docker.dashboard.domain.HasContainerName;
 import de.befrish.docker.dashboard.reactor.LinesEmitter;
+import de.befrish.docker.dashboard.service.ContainerIdResolver;
 import de.befrish.docker.dashboard.service.ContainerLogResolver;
 import de.befrish.docker.dashboard.ui.component.log.ContainerLogDownloadSincePanel;
 import de.befrish.docker.dashboard.ui.component.log.ContainerLogDownloadTailPanel;
@@ -18,11 +20,12 @@ import reactor.core.publisher.Flux;
 
 import java.util.Optional;
 
-@Route(value = "containers/:containerId/logs", layout = MainLayout.class)
+@Route(value = "containers/:containerName/logs", layout = MainLayout.class)
 public class ContainerLogsView extends VerticalLayout implements BeforeEnterObserver {
 
     private static final int LAST_LINES_COUNT = 300;
 
+    private final ContainerIdResolver containerIdResolver;
     private final ContainerLogResolver containerLogResolver;
     private final H2 header;
     private final ContainerLogPanel containerLogPanel;
@@ -31,7 +34,10 @@ public class ContainerLogsView extends VerticalLayout implements BeforeEnterObse
 
     private final VerticalLayout containerLogDownloadSincePanelContainer;
 
-    public ContainerLogsView(@NonNull final ContainerLogResolver containerLogResolver) {
+    public ContainerLogsView(
+            @NonNull final ContainerIdResolver containerIdResolver,
+            @NonNull final ContainerLogResolver containerLogResolver) {
+        this.containerIdResolver = containerIdResolver;
         this.containerLogResolver = containerLogResolver;
 
         header = new H2();
@@ -60,20 +66,24 @@ public class ContainerLogsView extends VerticalLayout implements BeforeEnterObse
 
     @Override
     public void beforeEnter(final BeforeEnterEvent event) {
-        final String containerId = event.getRouteParameters().get("containerId").orElse(null);
-        final HasContainerId container = Optional.ofNullable(containerId)
-                .<HasContainerId>map(containerId1 -> () -> containerId1)
-                .orElse(null);
-        updateHeader(container);
-        updateLogs(container, LAST_LINES_COUNT);
-        updateDownload(container);
+        final Optional<String> containerName = event.getRouteParameters().get("containerName");
+        containerName.ifPresent(containerName1 -> {
+            updateHeader(() -> containerName1);
+
+            final UI ui = UI.getCurrent();
+            containerIdResolver.resolve(containerName1)
+                    .subscribe(containerId -> ui.access(() -> {
+                        updateLogs(() -> containerId, LAST_LINES_COUNT);
+                        updateDownload(() -> containerId);
+                    }));
+        });
     }
 
-    private void updateHeader(final HasContainerId container) {
+    private void updateHeader(final HasContainerName container) {
         header.setText(
             Optional.ofNullable(container)
-                    .map(HasContainerId::getContainerId)
-                    .map("Logs für Container %s"::formatted) // TODO Container-Name beschreibender!
+                    .map(HasContainerName::getContainerName)
+                    .map("Logs für Container %s"::formatted)
                     .orElse("Kein Container gewählt") // TODO alternativ Fehlerseite mit 404 Not Found
         );
     }

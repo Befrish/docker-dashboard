@@ -27,7 +27,7 @@ public class WebClientApplicationStatusResolver implements ApplicationStatusReso
     private final WebClientProvider webClientProvider;
 
     @Override
-    public Mono<ApplicationStatus> getApplicationStatus(final ContainerApplicationData containerApplicationData) {
+    public Mono<ApplicationStatus> resolveApplicationStatus(final ContainerApplicationData containerApplicationData) {
         return containerApplicationData.getApplicationUrl()
                 .map(this::requestStatus)
                 .orElse(Mono.empty());

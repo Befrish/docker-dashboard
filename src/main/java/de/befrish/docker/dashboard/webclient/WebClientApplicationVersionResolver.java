@@ -20,7 +20,7 @@ public class WebClientApplicationVersionResolver implements ApplicationVersionRe
     private final VersionExtractor versionExtractor;
 
     @Override
-    public Mono<String> getApplicationVersion(final ContainerApplicationData containerApplicationData) {
+    public Mono<String> resolveApplicationVersion(final ContainerApplicationData containerApplicationData) {
         return containerApplicationData.getApplicationVersionUrl()
                 .map(applicationVersionUrl -> {
                     final String applicationVersionFormat

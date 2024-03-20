@@ -12,6 +12,8 @@ public class ContainerForActions implements HasContainerId {
 
     String containerId;
 
+    String containerName;
+
     String applicationUrl;
 
     boolean running;

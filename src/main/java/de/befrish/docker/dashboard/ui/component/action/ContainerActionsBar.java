@@ -26,7 +26,7 @@ import java.util.function.Function;
 public class ContainerActionsBar extends HorizontalLayout {
 
     public ContainerActionsBar(
-            @NonNull final Mono<ContainerForActions> container,
+            @NonNull final ContainerForActions container,
             @NonNull final ContainerControlProvider containerControlProvider) {
 
         final Button startButton = createActionButton(VaadinIcon.PLAY, "Starten");
@@ -36,48 +36,42 @@ public class ContainerActionsBar extends HorizontalLayout {
         final Button showStatsButton = createActionButton(VaadinIcon.BAR_CHART, "Zeige Stats");
 
         add(startButton, stopButton, restartButton, showLogsButton, showStatsButton);
+        container.getApplicationUrl().ifPresent(applicationUrl -> {
+            final Anchor gotoApplicationLink = createAnchor(
+                    VaadinIcon.EXTERNAL_LINK,
+                    "Gehe zur Anwendung",
+                    applicationUrl);
+            add(gotoApplicationLink);
+        });
 
-        final Collection<HasEnabled> disabledOnRunningComponents = List.of(startButton);
         final Collection<HasEnabled> enabledOnRunningComponents = List.of(stopButton, restartButton, showStatsButton);
+        final Collection<HasEnabled> disabledOnRunningComponents = List.of(startButton);
 
-        getStyle().set("display", "inline-block");
-
-        List.of(startButton, stopButton, restartButton, showLogsButton, showStatsButton)
-                .forEach(component -> component.setEnabled(false));
+        enabledOnRunningComponents.forEach(component -> component.setEnabled(container.isRunning()));
+        disabledOnRunningComponents.forEach(component -> component.setEnabled(!container.isRunning()));
 
         final UI ui = UI.getCurrent();
-        container.subscribe(container1 -> ui.access(() -> {
-            startButton.addClickListener(event -> runContainerCommand(
-                    container1,
-                    ContainerControl::start,
-                    containerControlProvider));
-            stopButton.addClickListener(event -> runContainerCommand(
-                    container1,
-                    ContainerControl::stop,
-                    containerControlProvider));
-            restartButton.addClickListener(event -> runContainerCommand(
-                    container1,
-                    ContainerControl::restart,
-                    containerControlProvider));
+        startButton.addClickListener(event -> runContainerCommand(
+                container,
+                ContainerControl::start,
+                containerControlProvider));
+        stopButton.addClickListener(event -> runContainerCommand(
+                container,
+                ContainerControl::stop,
+                containerControlProvider));
+        restartButton.addClickListener(event -> runContainerCommand(
+                container,
+                ContainerControl::restart,
+                containerControlProvider));
 
-            showLogsButton.addClickListener(event -> ui.navigate(
-                    ContainerLogsView.class,
-                    new RouteParameters("containerId", container1.getContainerId())));
-            showStatsButton.addClickListener(event -> ui.navigate(
-                    ContainerStatisticsView.class,
-                    new RouteParameters("containerId", container1.getContainerId())));
+        showLogsButton.addClickListener(event -> ui.navigate(
+                ContainerLogsView.class,
+                new RouteParameters("containerName", container.getContainerName())));
+        showStatsButton.addClickListener(event -> ui.navigate(
+                ContainerStatisticsView.class,
+                new RouteParameters("containerName", container.getContainerName())));
 
-            enabledOnRunningComponents.forEach(component -> component.setEnabled(container1.isRunning()));
-            disabledOnRunningComponents.forEach(component -> component.setEnabled(!container1.isRunning()));
-
-            container1.getApplicationUrl().ifPresent(applicationUrl -> {
-                final Anchor gotoApplicationLink = createAnchor(
-                        VaadinIcon.EXTERNAL_LINK,
-                        "Gehe zur Anwendung",
-                        applicationUrl);
-                add(gotoApplicationLink);
-            });
-        }));
+        getStyle().set("display", "inline-block");
     }
 
     private static Button createActionButton(final VaadinIcon icon, final String hintText) {

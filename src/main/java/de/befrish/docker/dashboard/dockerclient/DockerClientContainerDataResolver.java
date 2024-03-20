@@ -13,10 +13,10 @@ import reactor.core.publisher.Mono;
 public class DockerClientContainerDataResolver implements ContainerDataResolver {
 
     @NonNull
-    private ContainerResolver containerResolver;
+    private DockerContainerResolver dockerContainerResolver;
 
     public Mono<ContainerData> getContainerDataById(final HasContainerId container) {
-        return containerResolver.resolveById(container.getContainerId())
+        return dockerContainerResolver.resolveById(container.getContainerId())
                 .map(container1 -> ContainerData.builder()
                         .image(container1.image())
                         .ports(container1.portsAsString())

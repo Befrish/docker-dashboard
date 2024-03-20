@@ -19,6 +19,7 @@ public class ContainerForActionsMapper {
                 .flatMap(ContainerControl::isRunning)
                 .map(running -> ContainerForActions.builder()
                         .containerId(container.getContainerId())
+                        .containerName(container.getContainerName())
                         .applicationUrl(container.getApplicationUrl().orElse(null))
                         .running(running)
                         .build());

@@ -13,11 +13,11 @@ import reactor.core.publisher.Mono;
 public class DockerClientContainerStatusResolver implements ContainerStatusResolver {
 
     @NonNull
-    private ContainerResolver containerResolver;
+    private DockerContainerResolver dockerContainerResolver;
 
     @Override
     public Mono<String> resolveContainerStatusById(final HasContainerId container) {
-        return containerResolver.resolveById(container.getContainerId())
+        return dockerContainerResolver.resolveById(container.getContainerId())
                 .map(Container::status);
     }
 

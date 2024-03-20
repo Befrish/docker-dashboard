@@ -12,11 +12,11 @@ import reactor.core.publisher.Mono;
 public class DockerClientContainerIdResolver implements ContainerIdResolver {
 
     @NonNull
-    private final ContainerResolver containerResolver;
+    private final DockerContainerResolver dockerContainerResolver;
 
     @Override
     public Mono<String> resolve(final String containerName) {
-        return containerResolver.resolveByName(containerName).map(Container::id); // TODO BMU Cache?
+        return dockerContainerResolver.resolveByName(containerName).map(Container::id);
     }
 
 }

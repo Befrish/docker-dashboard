@@ -8,12 +8,12 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.Route;
-import de.befrish.docker.dashboard.domain.SettingsProject;
-import de.befrish.docker.dashboard.service.*;
+import de.befrish.docker.dashboard.service.ContainerControlProvider;
 import de.befrish.docker.dashboard.ui.component.ContainerGrid;
 import de.befrish.docker.dashboard.ui.component.ContainerUpdateRequestedEvent;
 import de.befrish.docker.dashboard.ui.eventbus.UiEventBus;
-import de.befrish.docker.dashboard.ui.service.ContainerForActionsMapper;
+import de.befrish.docker.dashboard.ui.model.ProjectForView;
+import de.befrish.docker.dashboard.ui.presenter.ProjectPresenter;
 import de.befrish.docker.dashboard.ui.service.NameUrlMapper;
 import lombok.NonNull;
 import reactor.core.publisher.Flux;
@@ -27,26 +27,21 @@ public class ProjectView extends VerticalLayout implements HasUrlParameter<Strin
     private static final String NO_PROJECT_TEXT = "<No project found>";
     private static final Duration UPDATE_PERIOD = Duration.ofSeconds(5);
 
+    @NonNull
     private final NameUrlMapper nameUrlMapper;
-    private final SettingsProjectResolver projectResolver;
-    private final ProjectContainerMapper projectContainerMapper;
+
+    @NonNull
+    private final ProjectPresenter projectPresenter;
 
     private final HtmlContainer projectName;
     private final ContainerGrid containerGrid;
 
     public ProjectView(
             @NonNull final NameUrlMapper nameUrlMapper,
-            @NonNull final SettingsProjectResolver projectResolver,
-            @NonNull final ProjectContainerMapper projectContainerMapper,
-            @NonNull final ContainerDataResolver containerDataResolver,
-            @NonNull final ContainerStatusResolver containerStatusResolver,
-            @NonNull final ContainerControlProvider containerControlProvider,
-            @NonNull final ApplicationStatusResolver applicationStatusResolver,
-            @NonNull final ApplicationVersionResolver applicationVersionResolver,
-            @NonNull final ContainerForActionsMapper containerForActionsMapper) {
+            @NonNull final ProjectPresenter projectPresenter,
+            @NonNull final ContainerControlProvider containerControlProvider) {
         this.nameUrlMapper = nameUrlMapper;
-        this.projectResolver = projectResolver;
-        this.projectContainerMapper = projectContainerMapper;
+        this.projectPresenter = projectPresenter;
 
         projectName = new H2(NO_PROJECT_TEXT);
         projectName.addClassNames("py-0", "px-m");
@@ -56,13 +51,7 @@ public class ProjectView extends VerticalLayout implements HasUrlParameter<Strin
         refreshButton.addClickListener(event -> UiEventBus.publish(new ContainerUpdateRequestedEvent(this)));
         add(refreshButton);
 
-        containerGrid = new ContainerGrid(
-                containerDataResolver,
-                containerStatusResolver,
-                containerControlProvider,
-                applicationStatusResolver,
-                applicationVersionResolver,
-                containerForActionsMapper);
+        containerGrid = new ContainerGrid(projectPresenter, containerControlProvider);
         addAndExpand(containerGrid);
 
         final UI ui = UI.getCurrent();
@@ -72,21 +61,19 @@ public class ProjectView extends VerticalLayout implements HasUrlParameter<Strin
 
     @Override
     public void setParameter(final BeforeEvent beforeEvent, final String projectNameParameter) {
-        Optional.ofNullable(projectNameParameter).ifPresent(projectNameParameter1 -> {
-            final String projectName = nameUrlMapper.mapFromUrlParameter(projectNameParameter);
-            final Optional<SettingsProject> project = projectResolver.findByName(projectName);
-            project.ifPresent(this::setProject);
-        });
+        Optional.ofNullable(projectNameParameter)
+                .flatMap(projectNameParameter1 -> {
+                    final String projectName = nameUrlMapper.mapFromUrlParameter(projectNameParameter);
+                    return projectPresenter.findProject(projectName);
+                })
+                .ifPresent(this::setProject);
     }
 
-    private void setProject(final SettingsProject project) {
+    private void setProject(final ProjectForView project) {
         projectName.setText(project.getName());
 
         final UI ui = UI.getCurrent();
-        Flux.fromIterable(project.getContainers())
-                .flatMap(projectContainerMapper::map)
-                .collectList()
-                .subscribe(containers -> ui.access(() -> containerGrid.setItems(containers)));
+        project.getContainers().subscribe(containers -> ui.access(() -> containerGrid.setItems(containers)));
     }
 
 }

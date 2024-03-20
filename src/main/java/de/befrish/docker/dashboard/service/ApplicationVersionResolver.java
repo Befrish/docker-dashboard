@@ -5,6 +5,6 @@ import reactor.core.publisher.Mono;
 
 public interface ApplicationVersionResolver {
 
-    Mono<String> getApplicationVersion(ContainerApplicationData containerApplicationData);
+    Mono<String> resolveApplicationVersion(ContainerApplicationData containerApplicationData);
 
 }

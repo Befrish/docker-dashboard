@@ -1,6 +1,5 @@
-1. ProjectConfiguration
-- Daten: Name (=Dashboard-Id/ViewParameter), 0..n DockerContainer (DisplayName, ContainerName(s), ContainerId, ...)
-2. Dashboard-Konfiguration mit Projekten aus yml lesen und darin speichern (später für Export/Import und Speicherung über Volumns oder Vorkonfiguration über Dockerfile) - hier zunächst nur die Möglichkeiten schaffen
+2. Dashboard-Konfiguration mit Projekten aus yml lesen und darin speichern
+   (später für Export/Import und Speicherung über Volumes oder Vorkonfiguration über Dockerfile) - hier zunächst nur die Möglichkeiten schaffen
 4. Menüstruktur beim Laden der Dashboard-Konfiguration (Projekte) aktualisieren
 - aktuelle View? (z.B. Projekt ist nicht mehr da) - Reload?
 - AppLayout mit Side Navigation (Section Projekte)
@@ -15,5 +14,6 @@
 8. Stats als Charts?
 9. Alte XML-Konfiguration einlesbar machen
 
+Tests!
 Live-Update
 Config: Importieren, Exportieren, Zur Konfiguration/Ansicht hinzufügen

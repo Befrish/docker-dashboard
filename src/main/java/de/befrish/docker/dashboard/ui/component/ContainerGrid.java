@@ -7,13 +7,11 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import de.befrish.docker.dashboard.domain.Container;
-import de.befrish.docker.dashboard.domain.ContainerData;
-import de.befrish.docker.dashboard.service.*;
+import de.befrish.docker.dashboard.service.ContainerControlProvider;
 import de.befrish.docker.dashboard.ui.component.action.ContainerActionsBar;
 import de.befrish.docker.dashboard.ui.component.renderer.AsyncMonoComponentRenderer;
-import de.befrish.docker.dashboard.ui.service.ContainerForActionsMapper;
+import de.befrish.docker.dashboard.ui.presenter.ProjectPresenter;
 import lombok.NonNull;
-import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 
@@ -22,12 +20,8 @@ public class ContainerGrid extends Grid<Container> {
     public static final Duration CACHE_DURATION = Duration.ofHours(1);
 
     public ContainerGrid(
-            @NonNull final ContainerDataResolver containerDataResolver,
-            @NonNull final ContainerStatusResolver containerStatusResolver,
-            @NonNull final ContainerControlProvider containerControlProvider,
-            @NonNull final ApplicationStatusResolver applicationStatusResolver,
-            @NonNull final ApplicationVersionResolver applicationVersionResolver,
-            @NonNull final ContainerForActionsMapper containerForActionsMapper) { // TODO UI Architecture: Controller/Presenter/...
+            @NonNull final ProjectPresenter projectPresenter,
+            @NonNull final ContainerControlProvider containerControlProvider) {
 
         addColumn(Container::getDisplayName)
                 .setHeader("Name")
@@ -40,8 +34,7 @@ public class ContainerGrid extends Grid<Container> {
                 .setResizable(true);
 
         addColumn(new AsyncMonoComponentRenderer<>(
-                container -> containerDataResolver.getContainerDataById(container)
-                        .map(ContainerData::getImage)
+                container -> projectPresenter.getContainerImage(container)
                         .cache(CACHE_DURATION), // does not change so often - needs reload to update
                 Span::new,
                 exception -> VaadinIcon.QUESTION_CIRCLE.create(),
@@ -51,8 +44,7 @@ public class ContainerGrid extends Grid<Container> {
                 .setResizable(true);
 
         addColumn(new AsyncMonoComponentRenderer<>(
-                container -> containerDataResolver.getContainerDataById(container)
-                        .map(ContainerData::getPorts)
+                container -> projectPresenter.getContainerPorts(container)
                         .cache(CACHE_DURATION), // does not change so often - needs reload to update
                 Span::new,
                 exception -> VaadinIcon.QUESTION_CIRCLE.create(),
@@ -62,7 +54,7 @@ public class ContainerGrid extends Grid<Container> {
                 .setResizable(true);
 
         addColumn(new AsyncMonoComponentRenderer<>(
-                containerStatusResolver::resolveContainerStatusById,
+                projectPresenter::getContainerStatus,
                 Span::new,
                 exception -> VaadinIcon.QUESTION_CIRCLE.create(),
                 ContainerUpdateRequestedEvent.class))
@@ -71,7 +63,7 @@ public class ContainerGrid extends Grid<Container> {
                 .setResizable(true);
 
         addColumn(new AsyncMonoComponentRenderer<>(
-                applicationStatusResolver::getApplicationStatus,
+                projectPresenter::getApplicationStatus,
                 applicationStatus -> centeredHorizontally(new ApplicationStatusImage(() -> applicationStatus)),
                 exception -> centeredHorizontally(VaadinIcon.QUESTION_CIRCLE.create()),
                 ContainerUpdateRequestedEvent.class))
@@ -80,7 +72,7 @@ public class ContainerGrid extends Grid<Container> {
                 .setFlexGrow(0);
 
         addColumn(new AsyncMonoComponentRenderer<>(
-                applicationVersionResolver::getApplicationVersion,
+                projectPresenter::getApplicationVersion,
                 Span::new,
                 exception -> VaadinIcon.QUESTION_CIRCLE.create(),
                 ContainerUpdateRequestedEvent.class))
@@ -89,10 +81,8 @@ public class ContainerGrid extends Grid<Container> {
                 .setResizable(true);
 
         addColumn(new AsyncMonoComponentRenderer<>(
-                containerForActionsMapper::map,
-                containerForActions -> new ContainerActionsBar(
-                        Mono.just(containerForActions), // TODO Async
-                        containerControlProvider),
+                projectPresenter::getContainerForActions,
+                containerForActions -> new ContainerActionsBar(containerForActions, containerControlProvider),
                 exception -> VaadinIcon.QUESTION_CIRCLE.create(),
                 ContainerUpdateRequestedEvent.class))
                 .setHeader("Actions")

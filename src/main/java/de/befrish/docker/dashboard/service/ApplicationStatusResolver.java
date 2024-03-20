@@ -6,6 +6,6 @@ import reactor.core.publisher.Mono;
 
 public interface ApplicationStatusResolver {
 
-    Mono<ApplicationStatus> getApplicationStatus(ContainerApplicationData containerApplicationData);
+    Mono<ApplicationStatus> resolveApplicationStatus(ContainerApplicationData containerApplicationData);
 
 }
