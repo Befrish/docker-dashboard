@@ -16,7 +16,7 @@ import java.util.Optional;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-class YamlSettingsResolverTest { // TODO implement
+class YamlSettingsResolverTest {
 
     private static final String VALID_SETTINGS_YAML = """
             projects:

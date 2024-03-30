@@ -16,13 +16,13 @@ services:
       - "15002:80"
 
   app53:
-    # Spring Boot Actuator + Simple Version-Endpoint
-    image: example.com/demo/version-demo-app:latest
+    # Spring Boot Actuator + Simple Version-Endpoint - https://github.com/Befrish/version-demo
+    image: befrish/version-demo:0.0.1-SNAPSHOT
     ports:
       - "16001:8080"
 
   app55:
-    # Spring Boot Actuator + Simple Version-Endpoint
-    image: example.com/demo/version-demo-app:latest
+    # Spring Boot Actuator + Simple Version-Endpoint - https://github.com/Befrish/version-demo
+    image: befrish/version-demo:0.0.1-SNAPSHOT
     ports:
       - "16002:8080"

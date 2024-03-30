@@ -25,6 +25,7 @@ class YamlSettingsPersisterTest { // TODO implement
                     containerName: "container42"
                     applicationUrl:
                     applicationVersionUrl:
+                    applicationVersionFormat:
             """;
 
     @Test

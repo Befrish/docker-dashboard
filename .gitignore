@@ -51,6 +51,7 @@ build/
 
 # Vaadin
 # The following files are automatically generated/updated
+node/
 node_modules/
 /node_modules/
 frontend/generated/

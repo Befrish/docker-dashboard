@@ -24,4 +24,7 @@ public class YamlContainer {
     @JsonProperty
     private String applicationVersionUrl;
 
+    @JsonProperty
+    private String applicationVersionFormat;
+
 }
