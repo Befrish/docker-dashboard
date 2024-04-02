@@ -19,6 +19,7 @@
 
 	<properties>
 		<java.version>21</java.version>
+		<start-class>de.befrish.docker.dashboard.DockerDashboardApplication</start-class>
 
 		<vaadin.version>24.3.8</vaadin.version>
 		<file-download-wrapper.version>7.0.0</file-download-wrapper.version>
