@@ -55,6 +55,7 @@ node/
 node_modules/
 /node_modules/
 frontend/generated/
+bundles/
 .npmrc
 vite.generated.ts
 package-lock.json
